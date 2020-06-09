@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Recall Update Tool</title>
+  <link rel="shortcut icon" href="https://www.cpsc.gov/sites/all/themes/cpsc/images/logo.png" type="image/png">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+
+<body>
+  <h1>Recall Update Tool</h1>
+  <br>
+  Steps for updating the recalls:
+  <ol>
+    <li>Input the date of the last recall in the input below, then click submit; The date can be found <a target="_blank" href="https://docs.google.com/spreadsheets/d/1PWpq_7w4DEV7MmO8j4A5urNX6sRshAfpOD8u2qzb8Cs/edit#gid=1878090856">here</a></li>
+    <li>If nothing appears below, then there are no recalls to update</li>
+    <li>If something does appear below, be sure that they are something that we include in our recalls and, if they are, insert them into the spreadsheet found <a target="_blank" href="https://docs.google.com/spreadsheets/d/1PWpq_7w4DEV7MmO8j4A5urNX6sRshAfpOD8u2qzb8Cs/edit#gid=1918772781">here</a></li>
+    <li>The information required for the spreadsheet can be found in the information below, as well as in the recall URL found below</li>
+  </ol>
+  <br>
+  Date of last recall update: <input type="text" id="lastRecall" onkeydown="if(event.keyCode==13) submit();">
+  <br>
+  <input type="button" value="Submit" onclick="submit()">
+  <br>
+  <br>
+  <div id="displayDiv"></div>
+  <br>
+  <br>
+
+  <script type="text/javascript">
+    var applianceTypes = [
+      "Boiler",
+      "Air Conditioner",
+      "Carbon Monoxide Detector",
+      "Carbon Monoxide Alarm",
+      "Ceiling Fan",
+      "Dehumidifier",
+      "Dishwasher",
+      "Dryer",
+      "Fireplace",
+      "Freezer",
+      "Furnace",
+      "Garage Door",
+      "Garbage Disposal",
+      "Gas Dryer",
+      "Water Heater",
+      "Gas Fireplace",
+      "Heater",
+      "Heating",
+      "Ventilation",
+      "Home Security",
+      "Hot Tub",
+      "Spa",
+      "Hot Water",
+      "Hot Dispenser",
+      "Microwave",
+      "Oil Burner",
+      "Stove",
+      "Radiator",
+      "Ranges",
+      "Oven",
+      "Refrigerator",
+      "Smoke Detector",
+      "Alarm",
+      "Freezer",
+      "Sump Pump",
+      "Washing Machine",
+      "Wood Fireplace"
+    ];
+
+    function submit() {
+      $('#displayDiv').html("");
+      for (var j = 0; j < applianceTypes.length; j++) {
+        getCPSC(applianceTypes[j]);
+      }
+    }
+
+    function getCPSC(applianceType) {
+      var lastRecall = new Date(document.getElementById("lastRecall").value);
+      var recallDate = lastRecall.getFullYear() + "-" + (lastRecall.getMonth() + 1) + "-" + lastRecall.getDate();
+
+      var restURL = "https://www.saferproducts.gov/RestWebServices/Recall?format=json";
+      restURL += "&RecallDateStart=" + recallDate + "&RecallTitle=" + applianceType.replace(/ /g, "%20");
+
+      $.ajax({
+        url: restURL,
+        type: 'GET',
+        datatype: 'json',
+        error: function(jqXHR, textStatus, errorThrown) {
+          var whatError = errorThrown;
+          alert(whatError);
+        },
+        success: function(recCollection) {
+          if (recCollection != null) {
+            if (recCollection.length > 0) {
+              for (var i = 0; i < recCollection.length; i++) {
+                if (!recCollection[i]) {
+                  noDataFound()
+                } else {
+                  printData(recCollection[i], restURL, applianceType, i);
+                }
+              }
+            } else {
+              noDataFound()
+              return;
+            }
+          } else {
+            noDataFound()
+            return;
+          }
+        }
+      });
+    }
+
+    function printData(data, restURL, applianceType, index) {
+      var recallDate = new Date(data.RecallDate);
+
+      var displayText = '<div id="' + applianceType.replace(/ /g, "") + '_' + index + '">';
+      displayText += '<h2>' + applianceType + '</h2>';
+      displayText += 'Recall Date = ' + recallDate.toDateString();
+      displayText += '<br />Recall ID = ' + data.RecallID;
+      displayText += '<br />Recall Number = ' + data.RecallNumber;
+      displayText += '<br />Recall Title = ' + data.Title;
+      if (data.Images[0]) {
+        displayText += '<br /><img height = "300" src="' + data.Images[0].URL.replace(/ /g, "%20") + '">';
+      }
+      displayText += '<br />Recall Description: <br />' + data.Description + '<br />';
+      displayText += '<br />Recall URL = <a href="' + data.URL + '" target="_blank">' + data.URL + '</a>';
+      displayText += '<br /><br /></div>';
+      $('#displayDiv').append(displayText);
+    }
+
+    function noDataFound() {
+      //$('#displayDiv').append("<p>NO CPSC DATA FOUND</p>");
+      return;
+    }
+
+    $(function() {
+      $("#lastRecall").datepicker();
+    });
+  </script>
+
+</body>
+
+</html>
