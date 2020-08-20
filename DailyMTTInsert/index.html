@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily MTT Insert</title>
+</head>
+<body onload="onLoad();">
+    <h1>Daily MTT Insert</h1>
+    <button onclick="toggleB2();"><div id="toggle">Toggle to B2B</div></button>
+    <form id="form" onsubmit="onSubmit(); return false">
+        <div id="B2C" style="display: block;">
+            <h2>B2C</h2>
+            <label for="dayOfYear">Day of Year:</label><br>
+            <input type="text" id="dayOfYear" name="dayOfYear"><br>
+            <label for="title">Title:</label><br>
+            <input type="text" id="title" name="title"><br>
+            <label for="description">Description:</label><br>
+            <input type="text" id="description" name="description"><br>
+            <label for="imgFileName">Image File Name:</label><br>
+            <input type="text" id="imgFileName" name="imgFileName"><br>
+            <button onclick="showImage();">Show Image</button>
+            <div id="image"></div>
+            <br>
+            <label for="seasonal_zone">Seasonal Zone:</label>
+            <input type="text" id="seasonal_zone" name="seasonal_zone" value="0"><br>
+            <br>
+            <div id="goals">
+                Goals:<br>
+            </div>
+            <br>
+            <div id="situations">
+                Situations:<br>
+            </div>
+            <br>
+            <input type="submit" value="Generate SQL Statements">
+            <br>
+        </div>
+        <div id="B2B" style="display: none;">
+            <h2>B2B</h2>
+            <label for="postable_id">Postable ID:</label><br>
+            <input type="text" id="postable_id" name="postable_id"><br>
+            <label for="postable_type">Postable Type:</label><br>
+            <input type="text" id="postable_type" name="postable_type"><br>
+            <label for="postable_title">Postable Title:</label><br>
+            <input type="text" id="postable_title" name="postable_title"><br>
+            <label for="postable_description">Postable Description:</label><br>
+            <input type="text" id="postable_description" name="postable_description"><br>
+            <label for="postable_image">Postable Image:</label><br>
+            <input type="text" id="postable_image" name="postable_image"><br>
+            <button onclick="showImage();">Show Image</button>
+            <div id="image_B2B"></div>
+            <br>
+            <label for="seasonal_zone_B2B">Seasonal Zone:</label>
+            <input type="text" id="seasonal_zone_B2B" name="seasonal_zone_B2B" value="0"><br>
+        </div>
+    </form>
+    <br>
+    <div id="SQL">
+
+    </div>
+
+    <script type="text/javascript">
+        var goals = [
+            "safe",
+            "fuel_econ",
+            "prev_maint",
+            "acc_tires",
+            "appear",
+            "rust",
+            "value",
+            "comf_conv",
+            "money",
+            "allergy",
+            "locks_security_car",
+            "locks_security_home"
+        ];
+
+        var situations = [
+            "sedan",
+            "minivan",
+            "suv",
+            "convertible",
+            "light_truck",
+            "any_passenger_car",
+            "high_profile_vehicle",
+            "gas",
+            "diesel",
+            "hybrid",
+            "electric",
+            "gas_or_diesel",
+            "hybrid_or_electric",
+            "new_vehicle",
+            "middle_aged",
+            "old_vehicle",
+            "new_or_middle_aged",
+            "middle_or_old_aged",
+            "low_mileage",
+            "mid_mileage",
+            "high_mileage",
+            "low_or_mid_mileage",
+            "mid_or_high_mileage",
+            "low_miles_yearly",
+            "med_miles_yearly",
+            "high_miles_yearly",
+            "low_or_med_yearly",
+            "med_or_high_yearly",
+            "low_highway",
+            "med_highway",
+            "high_highway",
+            "low_or_med_highway",
+            "med_or_high_highway",
+            "rarely_off_road",
+            "med_off_road",
+            "high_off_road",
+            "any_off_road",
+            "rarely_or_med_off_road",
+            "med_or_high_off_road",
+            "rarely_trailer",
+            "med_trailer",
+            "high_trailer",
+            "any_trailer",
+            "rarely_or_med_trailer",
+            "med_or_high_trailer",
+            "teen_driver",
+            "senior_driver",
+            "new_driver",
+            "phys_challenged",
+            "teen_or_new_driver",
+            "garaged_days",
+            "garaged_eves",
+            "not_garaged_days",
+            "not_garaged_eves",
+            "luggage_rack",
+            "bike_carrier",
+            "pets",
+            "children",
+            "infants",
+            "hard_driving_situations",
+            "children_or_infants"
+        ];
+
+        const goalsDiv = document.getElementById("goals");
+        const situationsDiv = document.getElementById("situations");
+        const SQLDiv = document.getElementById("SQL");
+
+        function onLoad() {
+            for (var i = 0; i < goals.length; i++) {
+                goalsDiv.innerHTML += '<input type="checkbox" id="' + goals[i] + '" name="' + goals[i] + '">';
+                goalsDiv.innerHTML += '<label for="' + goals[i]+'">' + goals[i] + '</label><br>'
+            }
+            for (var i = 0; i < situations.length; i++) {
+                situationsDiv.innerHTML += '<input type="checkbox" id="' + situations[i] + '" name="' + situations[i] + '">';
+                situationsDiv.innerHTML += '<label for="' + situations[i]+'">' + situations[i] + '</label><br>'
+            }
+        }
+
+        function toggleB2() {
+            const B2CDiv = document.getElementById("B2C");
+            const B2BDiv = document.getElementById("B2B");
+            const toggleText = document.getElementById("toggle");
+            if (B2CDiv.style.display === "none") {
+                B2CDiv.style.display = "block";
+                B2BDiv.style.display = "none";
+                toggleText.innerHTML = "Toggle to B2B";
+            } else {
+                B2CDiv.style.display = "none";
+                B2BDiv.style.display = "block";
+                toggleText.innerHTML = "Toggle to B2C";
+            }
+            SQLDiv.innerHTML = "";
+        }
+
+        function showImage() {
+            var imgDiv;
+            var imgFile1;
+            var imgFile2;
+            if (document.getElementById("B2C").style.display === "none") {
+                imgDiv = document.getElementById("image_B2B");
+                imgFile1 = "https://applica-solutions.com/images/car-wizard-postables-assn/" + document.getElementById("form").elements['postable_image'].value;
+                imgFile2 = "https://car-wizard.com/images/car-wizard-postables-assn/" + document.getElementById("form").elements['postable_image'].value;
+            } else {
+                imgDiv = document.getElementById("image");
+                imgFile1 = "https://applica-solutions.com/images/car-wizard-postables/" + document.getElementById("form").elements['imgFileName'].value;
+                imgFile2 = "https://car-wizard.com/images/car-wizard-postables/" + document.getElementById("form").elements['imgFileName'].value;
+            }
+            imgDiv.innerHTML = '<div>https://applica-solutions.com:<br><img src="' + imgFile1 +'" width=600></div>';
+            imgDiv.innerHTML += '<div>https://car-wizard.com:<br><img src="' + imgFile2 +'" width=600></div>';
+        }
+
+        function onSubmit() {
+            SQLDiv.innerHTML = "";
+
+            const form = document.getElementById("form");
+            const dayOfYear = form.elements['dayOfYear'].value;
+            const title = form.elements['title'].value;
+            const description = form.elements['description'].value;
+            const imgFileName = form.elements['imgFileName'].value;
+            
+            // Postables from DB Query string
+            var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables]([dayofyear],[image] ,[title] ,[description],[image_width] ,[image_height]) VALUES (";
+            insertCarWizardPostable += dayOfYear + ",'";
+            insertCarWizardPostable += "/images/car-wizard-postables/" + imgFileName + "','";
+            insertCarWizardPostable += title + "','";
+            insertCarWizardPostable += description.replace(/'/g, "''") + "',1200,628)";
+
+            console.log(insertCarWizardPostable);
+            SQLDiv.innerHTML += insertCarWizardPostable + "<br>";
+
+            // GS Seasonal Zones
+            var seasonalZones = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'seasonal_zone','" + form.elements['seasonal_zone'].value + "')"
+            console.log(seasonalZones);
+            SQLDiv.innerHTML += seasonalZones + "<br>";
+
+            // GS Goals
+            for (var i = 0; i < goals.length; i++) {
+                if (form.elements[goals[i]].checked) {
+                    var goalSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'goal','" + goals[i] + "')";
+                    console.log(goalSQL);
+                    SQLDiv.innerHTML += goalSQL + "<br>";
+                }
+            }
+            // GS Situations
+            for (var i = 0; i < situations.length; i++) {
+                if (form.elements[situations[i]].checked) {
+                    var situationSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'situation','" + situations[i] + "')";
+                    console.log(situationSQL);
+                    SQLDiv.innerHTML += situationSQL + "<br>";
+                }
+            }
+        }
+    
+    </script>
+</body>
+</html>
