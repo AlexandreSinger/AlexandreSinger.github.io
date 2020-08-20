@@ -19,7 +19,7 @@
             <label for="imgFileName">Image File Name:</label><br>
             <input type="text" id="imgFileName" name="imgFileName"><br>
             <button onclick="showImage();">Show Image</button>
-            <div id="image"></div>
+            <div id="image" style="max-width: 1200; position:fixed; top:0; right:0;"></div>
             <br>
             <label for="seasonal_zone">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone" name="seasonal_zone" value="0"><br>
@@ -48,7 +48,7 @@
             <label for="postable_image">Postable Image:</label><br>
             <input type="text" id="postable_image" name="postable_image"><br>
             <button onclick="showImage();">Show Image</button>
-            <div id="image_B2B"></div>
+            <div id="image_B2B" style="max-width: 1200; position:fixed; top:0; right:0;"></div>
             <br>
             <label for="seasonal_zone_B2B">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone_B2B" name="seasonal_zone_B2B" value="0"><br>
@@ -216,8 +216,8 @@
                 imgFile1 = "https://applica-solutions.com/images/car-wizard-postables/" + document.getElementById("form").elements['imgFileName'].value;
                 imgFile2 = "https://car-wizard.com/images/car-wizard-postables/" + document.getElementById("form").elements['imgFileName'].value;
             }
-            imgDiv.innerHTML = '<div>https://applica-solutions.com:<br><img src="' + imgFile1 +'" width=600></div>';
-            imgDiv.innerHTML += '<div>https://car-wizard.com:<br><img src="' + imgFile2 +'" width=600></div>';
+            imgDiv.innerHTML = '<div style="float: left;">' + imgFile1 + ':<br><img src="' + imgFile1 +'" width=600></div>';
+            imgDiv.innerHTML += '<div style="float: left;">' + imgFile2 + ':<br><img src="' + imgFile2 +'" width=600></div>';
         }
 
         function generateSQLB2C() {
@@ -234,19 +234,16 @@
             insertCarWizardPostable += title + "','";
             insertCarWizardPostable += description.replace(/'/g, "''") + "',1200,628)";
 
-            console.log(insertCarWizardPostable);
             SQLDiv.innerHTML += insertCarWizardPostable + "<br>";
 
             // GS Seasonal Zones
             var seasonalZones = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'seasonal_zone','" + form.elements['seasonal_zone'].value + "')"
-            console.log(seasonalZones);
             SQLDiv.innerHTML += seasonalZones + "<br>";
 
             // GS Goals
             for (var i = 0; i < goals.length; i++) {
                 if (form.elements[goals[i]].checked) {
                     var goalSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'goal','" + goals[i] + "')";
-                    console.log(goalSQL);
                     SQLDiv.innerHTML += goalSQL + "<br>";
                 }
             }
@@ -254,7 +251,6 @@
             for (var i = 0; i < situations.length; i++) {
                 if (form.elements[situations[i]].checked) {
                     var situationSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'situation','" + situations[i] + "')";
-                    console.log(situationSQL);
                     SQLDiv.innerHTML += situationSQL + "<br>";
                 }
             }
@@ -268,10 +264,6 @@
             const postable_description = form.elements['postable_description'].value;
             var postable_url = form.elements['postable_url'].value;
             const postable_image = form.elements['postable_image'].value;
-
-            if (postable_url == '') {
-                postable_url = "NULL";
-            }
             
             // Insert into postables
             var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables_Assn]([postable_id],[postable_type] ,[postable_title] ,[postable_description], [postable_url], [postable_image],[image_width] ,[image_height]) VALUES (";
