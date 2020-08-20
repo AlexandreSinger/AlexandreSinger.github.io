@@ -9,6 +9,7 @@
     <form id="form" onsubmit="onSubmit(); return false">
         <div id="B2C" style="display: block;">
             <h2>B2C</h2>
+            <button onclick="autoPopulateB2C();">Auto Populate</button><br>
             <label for="dayOfYear">Day of Year:</label><br>
             <input type="text" id="dayOfYear" name="dayOfYear"><br>
             <label for="title">Title:</label><br>
@@ -33,6 +34,7 @@
         </div>
         <div id="B2B" style="display: none;">
             <h2>B2B</h2>
+            <button onclick="autoPopulateB2B();">Auto Populate</button><br>
             <label for="postable_id">Postable ID:</label><br>
             <input type="text" id="postable_id" name="postable_id"><br>
             <label for="postable_type">Postable Type:</label><br>
@@ -293,6 +295,38 @@
                     SQLDiv.innerHTML += goalSQL + "<br>";
                 }
             }
+        }
+
+        function autoPopulateB2C() {
+            navigator.clipboard.readText()
+                .then(text => {
+                    var splittedText = text.split('\t');
+                    form.elements['dayOfYear'].value = splittedText[0];
+                    form.elements['title'].value = splittedText[1];
+                    form.elements['description'].value = splittedText[2];
+                    form.elements['imgFileName'].value = splittedText[3];
+                    showImage();
+                })
+                .catch(err => {
+                    console.error('Failed to read clipboard contents: ', err);
+                });
+        }
+
+        function autoPopulateB2B() {
+            navigator.clipboard.readText()
+                .then(text => {
+                    var splittedText = text.split('\t');
+                    form.elements['postable_id'].value = splittedText[0];
+                    form.elements['postable_type'].value = splittedText[1];
+                    form.elements['postable_title'].value = splittedText[2];
+                    form.elements['postable_description'].value = splittedText[3];
+                    form.elements['postable_image'].value = splittedText[4];
+                    form.elements['postable_url'].value = splittedText[5];
+                    showImage();
+                })
+                .catch(err => {
+                    console.error('Failed to read clipboard contents: ', err);
+                });
         }
 
         function onSubmit() {
