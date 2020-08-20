@@ -41,6 +41,8 @@
             <input type="text" id="postable_title" name="postable_title"><br>
             <label for="postable_description">Postable Description:</label><br>
             <input type="text" id="postable_description" name="postable_description"><br>
+            <label for="postable_url">Postable URL:</label><br>
+            <input type="text" id="postable_url" name="postable_url"><br>
             <label for="postable_image">Postable Image:</label><br>
             <input type="text" id="postable_image" name="postable_image"><br>
             <button onclick="showImage();">Show Image</button>
@@ -262,14 +264,20 @@
             const postable_type = form.elements['postable_type'].value;
             const postable_title = form.elements['postable_title'].value;
             const postable_description = form.elements['postable_description'].value;
+            var postable_url = form.elements['postable_url'].value;
             const postable_image = form.elements['postable_image'].value;
+
+            if (postable_url == '') {
+                postable_url = "NULL";
+            }
             
             // Insert into postables
-            var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables_Assn]([postable_id],[postable_type] ,[postable_title] ,[postable_description], [postable_image],[image_width] ,[image_height]) VALUES (";
+            var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables_Assn]([postable_id],[postable_type] ,[postable_title] ,[postable_description], [postable_url], [postable_image],[image_width] ,[image_height]) VALUES (";
             insertCarWizardPostable += postable_id + ",'";
             insertCarWizardPostable += postable_type + "','";
             insertCarWizardPostable += postable_title + "','";
             insertCarWizardPostable += postable_description.replace(/'/g, "''") + "','";
+            insertCarWizardPostable += postable_url + "','"
             insertCarWizardPostable += "/images/car-wizard-postables-assn/" + postable_image + "',1200,628)";
 
             SQLDiv.innerHTML += insertCarWizardPostable + "<br>";
