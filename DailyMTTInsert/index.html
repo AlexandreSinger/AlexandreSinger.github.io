@@ -30,9 +30,6 @@
             <div id="situations">
                 Situations:<br>
             </div>
-            <br>
-            <input type="submit" value="Generate SQL Statements">
-            <br>
         </div>
         <div id="B2B" style="display: none;">
             <h2>B2B</h2>
@@ -51,7 +48,14 @@
             <br>
             <label for="seasonal_zone_B2B">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone_B2B" name="seasonal_zone_B2B" value="0"><br>
+            <br>
+            <div id="B2B_goals">
+                Goals:<br>
+            </div>
         </div>
+        <br>
+        <input type="submit" value="Generate SQL Statements">
+        <br>
     </form>
     <br>
     <div id="SQL">
@@ -138,7 +142,28 @@
             "children_or_infants"
         ];
 
+        var B2B_goals = [
+            "news_regulatory",
+            "news_legislative",
+            "news_technology",
+            "news_economics",
+            "new_business_owners",
+            "inspirational_messages",
+            "human_resources",
+            "finance",
+            "public_relations",
+            "risk_management",
+            "marketing",
+            "strategic_planning",
+            "information_technology",
+            "customer_service",
+            "supply_chain",
+            "general_automotive",
+            "automotive_humor"
+        ];
+
         const goalsDiv = document.getElementById("goals");
+        const B2BGoalsDiv = document.getElementById("B2B_goals");
         const situationsDiv = document.getElementById("situations");
         const SQLDiv = document.getElementById("SQL");
 
@@ -150,6 +175,11 @@
             for (var i = 0; i < situations.length; i++) {
                 situationsDiv.innerHTML += '<input type="checkbox" id="' + situations[i] + '" name="' + situations[i] + '">';
                 situationsDiv.innerHTML += '<label for="' + situations[i]+'">' + situations[i] + '</label><br>'
+            }
+
+            for (var i = 0; i < B2B_goals.length; i++) {
+                B2BGoalsDiv.innerHTML += '<input type="checkbox" id="' + B2B_goals[i] + '" name="' + B2B_goals[i] + '">';
+                B2BGoalsDiv.innerHTML += '<label for="' + B2B_goals[i]+'">' + B2B_goals[i] + '</label><br>'
             }
         }
 
@@ -186,9 +216,7 @@
             imgDiv.innerHTML += '<div>https://car-wizard.com:<br><img src="' + imgFile2 +'" width=600></div>';
         }
 
-        function onSubmit() {
-            SQLDiv.innerHTML = "";
-
+        function generateSQLB2C() {
             const form = document.getElementById("form");
             const dayOfYear = form.elements['dayOfYear'].value;
             const title = form.elements['title'].value;
@@ -225,6 +253,47 @@
                     console.log(situationSQL);
                     SQLDiv.innerHTML += situationSQL + "<br>";
                 }
+            }
+        }
+
+        function generateSQLB2B() {
+            const form = document.getElementById("form");
+            const postable_id = form.elements['postable_id'].value;
+            const postable_type = form.elements['postable_type'].value;
+            const postable_title = form.elements['postable_title'].value;
+            const postable_description = form.elements['postable_description'].value;
+            const postable_image = form.elements['postable_image'].value;
+            
+            // Insert into postables
+            var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables_Assn]([postable_id],[postable_type] ,[postable_title] ,[postable_description], [postable_image],[image_width] ,[image_height]) VALUES (";
+            insertCarWizardPostable += postable_id + ",'";
+            insertCarWizardPostable += postable_type + "','";
+            insertCarWizardPostable += postable_title + "','";
+            insertCarWizardPostable += postable_description.replace(/'/g, "''") + "','";
+            insertCarWizardPostable += "/images/car-wizard-postables-assn/" + postable_image + "',1200,628)";
+
+            SQLDiv.innerHTML += insertCarWizardPostable + "<br>";
+
+            // Insert seasonal zone
+            var seasonalZones = "INSERT INTO [homewizard_test2user].[Data_MTT_GS_Assn] ([mtt_id], [type], [gs_id]) values (" + postable_id + ",'seasonal_zone','" + form.elements['seasonal_zone_B2B'].value + "')"
+            SQLDiv.innerHTML += seasonalZones + "<br>";
+
+            // Insert goals
+            for (var i = 0; i < B2B_goals.length; i++) {
+                if (form.elements[B2B_goals[i]].checked) {
+                    var goalSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS_Assn] ([mtt_id], [type], [gs_id]) values (" + postable_id + ",'goal','" + B2B_goals[i] + "')";
+                    SQLDiv.innerHTML += goalSQL + "<br>";
+                }
+            }
+        }
+
+        function onSubmit() {
+            SQLDiv.innerHTML = "";
+
+            if (document.getElementById("B2C").style.display === "none") {
+                generateSQLB2B();
+            } else {
+                generateSQLB2C();
             }
         }
     
