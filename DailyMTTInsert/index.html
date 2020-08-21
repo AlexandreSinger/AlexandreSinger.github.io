@@ -6,7 +6,7 @@
 <body onload="onLoad();">
     <h1>Daily MTT Insert</h1>
     <button onclick="toggleB2();"><div id="toggle">Toggle to B2B</div></button>
-    <form id="form" onsubmit="onSubmit(); return false">
+    <form id="form" onsubmit="return false;">
         <div id="B2C" style="display: block;">
             <h2>B2C</h2>
             <button onclick="autoPopulateB2C();">Auto Populate</button><br>
@@ -19,7 +19,7 @@
             <label for="imgFileName">Image File Name:</label><br>
             <input type="text" id="imgFileName" name="imgFileName" size="35"><br>
             <button onclick="showImage();">Show Image</button>
-            <div id="image" style="max-width: 1200; position:fixed; top:0; right:0;"></div>
+            <!-- <div id="image" style="max-width: 1200;"></div> -->
             <br>
             <label for="seasonal_zone">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone" name="seasonal_zone" value="0"><br>
@@ -48,7 +48,7 @@
             <label for="postable_image">Postable Image:</label><br>
             <input type="text" id="postable_image" name="postable_image" size="35"><br>
             <button onclick="showImage();">Show Image</button>
-            <div id="image_B2B" style="max-width: 1200; position:fixed; top:0; right:0;"></div>
+            <!-- <div id="image_B2B" style="max-width: 1200;"></div> -->
             <br>
             <label for="seasonal_zone_B2B">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone_B2B" name="seasonal_zone_B2B" value="0"><br>
@@ -58,13 +58,16 @@
             </div>
         </div>
         <br>
-        <input type="submit" value="Generate SQL Statements">
+        <button onclick="onSubmit();">Generate SQL Statements</button>
         <br>
+        <br>
+        <div id="SQL"></div>
+        <button onclick="copySQL();">Copy SQL to Clipboard</button>
+        <br>
+        <br>
+        <div id="image" style="max-width: 1200; display: block;"></div>
+        <div id="image_B2B" style="max-width: 1200; display:none;"></div>
     </form>
-    <br>
-    <div id="SQL">
-
-    </div>
 
     <script type="text/javascript">
         var goals = [
@@ -193,11 +196,15 @@
             const toggleText = document.getElementById("toggle");
             if (B2CDiv.style.display === "none") {
                 B2CDiv.style.display = "block";
+                document.getElementById("image").style.display = "block";
                 B2BDiv.style.display = "none";
+                document.getElementById("image_B2B").style.display = "none";
                 toggleText.innerHTML = "Toggle to B2B";
             } else {
                 B2CDiv.style.display = "none";
+                document.getElementById("image").style.display = "none";
                 B2BDiv.style.display = "block";
+                document.getElementById("image_B2B").style.display = "block";
                 toggleText.innerHTML = "Toggle to B2C";
             }
             SQLDiv.innerHTML = "";
@@ -266,8 +273,7 @@
             const postable_image = form.elements['postable_image'].value;
             
             // Insert into postables
-            var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables_Assn]([postable_id],[postable_type] ,[postable_title] ,[postable_description], [postable_url], [postable_image],[image_width] ,[image_height]) VALUES (";
-            insertCarWizardPostable += postable_id + ",'";
+            var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables_Assn]([postable_type] ,[postable_title] ,[postable_description], [postable_url], [postable_image],[image_width] ,[image_height]) VALUES ('";
             insertCarWizardPostable += postable_type + "','";
             insertCarWizardPostable += postable_title + "','";
             insertCarWizardPostable += postable_description.replace(/'/g, "''") + "','";
@@ -301,6 +307,17 @@
                 })
                 .catch(err => {
                     console.error('Failed to read clipboard contents: ', err);
+                });
+        }
+
+        function copySQL() {
+            navigator.clipboard.writeText(SQLDiv.innerText)
+                .then(() => {
+                    console.log(SQLDiv.innerText);
+                })
+                .catch(err => {
+                    // This can happen if the user denies clipboard permissions:
+                    console.error('Could not copy text: ', err);
                 });
         }
 
