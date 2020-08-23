@@ -19,7 +19,6 @@
             <label for="imgFileName">Image File Name:</label><br>
             <input type="text" id="imgFileName" name="imgFileName" size="35"><br>
             <button onclick="showImage();">Show Image</button>
-            <!-- <div id="image" style="max-width: 1200;"></div> -->
             <br>
             <label for="seasonal_zone">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone" name="seasonal_zone" value="0"><br>
@@ -48,7 +47,6 @@
             <label for="postable_image">Postable Image:</label><br>
             <input type="text" id="postable_image" name="postable_image" size="35"><br>
             <button onclick="showImage();">Show Image</button>
-            <!-- <div id="image_B2B" style="max-width: 1200;"></div> -->
             <br>
             <label for="seasonal_zone_B2B">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone_B2B" name="seasonal_zone_B2B" value="0"><br>
@@ -169,6 +167,7 @@
             "automotive_humor"
         ];
 
+        const form = document.getElementById("form");
         const goalsDiv = document.getElementById("goals");
         const B2BGoalsDiv = document.getElementById("B2B_goals");
         const situationsDiv = document.getElementById("situations");
@@ -243,11 +242,16 @@
         }
 
         function generateSQLB2C() {
-            const form = document.getElementById("form");
             const dayOfYear = form.elements['dayOfYear'].value;
             const title = form.elements['title'].value;
             const description = form.elements['description'].value;
             const imgFileName = form.elements['imgFileName'].value;
+
+            // Check for invalid data
+            if (dayOfYear == '' || title == '' || description == '' || imgFileName == '') {
+                alert("Invalid input make sure all fields are filled in.");
+                return;
+            }
             
             // Postables from DB Query string
             var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables]([dayofyear],[image] ,[title] ,[description],[image_width] ,[image_height]) VALUES (";
@@ -279,14 +283,19 @@
         }
 
         function generateSQLB2B() {
-            const form = document.getElementById("form");
             const postable_id = form.elements['postable_id'].value;
             const postable_type = form.elements['postable_type'].value;
             const postable_title = form.elements['postable_title'].value;
             const postable_description = form.elements['postable_description'].value;
-            var postable_url = form.elements['postable_url'].value;
+            const postable_url = form.elements['postable_url'].value;
             const postable_image = form.elements['postable_image'].value;
             
+            // Check for invalid data
+            if (postable_id == '' || postable_type == '' || postable_title == '' || postable_description == '' || postable_image == '' || (postable_type.toLowerCase() == 'article' && postable_url == '')) {
+                alert("Invalid input make sure all fields are filled in.");
+                return;
+            }
+
             // Insert into postables
             var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables_Assn]([postable_type] ,[postable_title] ,[postable_description], [postable_url], [postable_image],[image_width] ,[image_height]) VALUES ('";
             insertCarWizardPostable += postable_type + "','";
