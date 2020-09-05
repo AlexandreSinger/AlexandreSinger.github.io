@@ -174,6 +174,9 @@
         const SQLDiv = document.getElementById("SQL");
 
         var getParams = function (url) {
+            if (url.indexOf("?") == -1) {
+                return;
+            }
             query = url.split("?")[1];
             var vars = query.split('&');
             for (var i = 0; i < vars.length; i++) {
@@ -318,8 +321,47 @@
                 }
             }
         }
+        
+        function clearFieldsB2C() {
+            // Clear the Input fields
+            form.elements['dayOfYear'].value = '';
+            form.elements['title'].value = '';
+            form.elements['description'].value = '';
+            form.elements['imgFileName'].value = '';
+
+            // Clear Seasonal Zone
+            form.elements['seasonal_zone'].value = '0';
+
+            // Clear goals
+            for (var i = 0; i < goals.length; i++) {
+                form.elements[goals[i]].checked = false;
+            }
+            // Clear situations
+            for (var i = 0; i < situations.length; i++) {
+                form.elements[situations[i]].checked = false;
+            }
+        }
+
+        function clearFieldsB2B() {
+            // Clear input fields
+            form.elements['postable_id'].value = '';
+            form.elements['postable_type'].value = '';
+            form.elements['postable_title'].value = '';
+            form.elements['postable_description'].value = '';
+            form.elements['postable_image'].value = '';
+            form.elements['postable_url'].value = '';
+
+            // Clear Seasonal Zone
+            form.elements['seasonal_zone_B2B'].value = '0';
+
+            // Clear goals
+            for (var i = 0; i < B2B_goals.length; i++) {
+                form.elements[B2B_goals[i]].checked = false;
+            }
+        }
 
         function autoPopulateB2C() {
+            clearFieldsB2C();
             navigator.clipboard.readText()
                 .then(text => {
                     var splittedText = text.split('\t');
@@ -346,6 +388,7 @@
         }
 
         function autoPopulateB2B() {
+            clearFieldsB2B();
             navigator.clipboard.readText()
                 .then(text => {
                     var splittedText = text.split('\t');
