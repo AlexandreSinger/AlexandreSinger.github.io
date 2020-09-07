@@ -78,6 +78,9 @@ function clearFieldsB2C() {
     for (var i = 0; i < situations.length; i++) {
         form.elements[situations[i]].checked = false;
     }
+
+    // Clear SQL Div
+    SQLDiv.innerHTML = '';
 }
 
 function autoPopulateB2C() {

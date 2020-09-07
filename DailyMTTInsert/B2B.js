@@ -68,6 +68,9 @@ function clearFieldsB2B() {
     for (var i = 0; i < B2B_goals.length; i++) {
         form.elements[B2B_goals[i]].checked = false;
     }
+
+    // Clear SQL Div
+    SQLDiv.innerHTML = '';
 }
 
 function autoPopulateB2B() {
