@@ -7,6 +7,10 @@ function onLoadB2C() {
         situationsDiv.innerHTML += '<input type="checkbox" id="' + situations[i] + '" name="' + situations[i] + '">';
         situationsDiv.innerHTML += '<label for="' + situations[i]+'">' + situations[i] + '</label><br>'
     }
+    for (var i = 0; i < businesses.length; i++) {
+        businessesDiv.innerHTML += '<input type="checkbox" id="' + businesses[i] + '" name="' + businesses[i] + '">';
+        businessesDiv.innerHTML += '<label for="' + businesses[i]+'">' + businesses[i] + '</label><br>';
+    }
 }
 
 function showB2C() {
@@ -44,6 +48,15 @@ function generateSQLB2C() {
     var seasonalZones = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'seasonal_zone','" + form.elements['seasonal_zone'].value + "')"
     SQLDiv.innerHTML += seasonalZones + "<br>";
 
+    // GS Businesses
+    for (var i = 0; i < businesses.length; i++) {
+        if (form.elements[businesses[i]].checked) {
+            var businessSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'business','" + businesses[i] + "')";
+            businessSQL += "<br>";
+            businessSQL += "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'not-if','" + businesses[i] + "')";
+            SQLDiv.innerHTML += businessSQL + "<br>";
+        }
+    }
     // GS Goals
     for (var i = 0; i < goals.length; i++) {
         if (form.elements[goals[i]].checked) {
@@ -77,6 +90,10 @@ function clearFieldsB2C() {
     // Clear situations
     for (var i = 0; i < situations.length; i++) {
         form.elements[situations[i]].checked = false;
+    }
+    // Clear businesses
+    for (var i = 0; i < businesses.length; i++) {
+        form.elements[businesses[i]].checked = false;
     }
 
     // Clear SQL Div

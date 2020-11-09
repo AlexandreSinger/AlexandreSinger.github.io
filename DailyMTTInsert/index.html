@@ -26,6 +26,10 @@
             <label for="seasonal_zone">Seasonal Zone:</label>
             <input type="text" id="seasonal_zone" name="seasonal_zone" value="0"><br>
             <br>
+            <div id="businesses">
+                Businesses:<br>
+            </div>
+            <br>
             <div id="goals">
                 Goals:<br>
             </div>
@@ -75,6 +79,7 @@
         const goalsDiv = document.getElementById("goals");
         const B2BGoalsDiv = document.getElementById("B2B_goals");
         const situationsDiv = document.getElementById("situations");
+        const businessesDiv = document.getElementById("businesses");
         const SQLDiv = document.getElementById("SQL");
 
         var getParams = function (url) {
