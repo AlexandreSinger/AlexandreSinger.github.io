@@ -9,7 +9,9 @@ function onLoadB2C() {
     }
     for (var i = 0; i < businesses.length; i++) {
         businessesDiv.innerHTML += '<input type="checkbox" id="' + businesses[i] + '" name="' + businesses[i] + '">';
-        businessesDiv.innerHTML += '<label for="' + businesses[i]+'">' + businesses[i] + '</label><br>';
+        businessesDiv.innerHTML += '<label for="' + businesses[i]+'">' + businesses[i] + ', ' + '</label>';
+        businessesDiv.innerHTML += '<input type="checkbox" id="' + businesses[i] + '-not-if' + '" name="' + businesses[i] + '-not-if' + '">';
+        businessesDiv.innerHTML += '<label for="' + businesses[i] + '-not-if'+'">' + 'not-if' + '</label><br>';
     }
 }
 
@@ -34,6 +36,14 @@ function generateSQLB2C() {
         alert("Invalid input make sure all fields are filled in.");
         return;
     }
+
+    // Check if a business was selected for business and not-if
+    for (var i = 0; i < businesses.length; i++) {
+        if (form.elements[businesses[i]].checked && form.elements[businesses[i] + '-not-if'].checked) {
+            alert("Business selected for both type = business and type = not-if. Cannot be both.");
+            return;
+        }
+    }
     
     // Postables from DB Query string
     var insertCarWizardPostable = "INSERT INTO [homewizard_test2user].[CarWizard_Postables]([dayofyear],[image] ,[title] ,[description],[image_width] ,[image_height]) VALUES (";
@@ -52,8 +62,10 @@ function generateSQLB2C() {
     for (var i = 0; i < businesses.length; i++) {
         if (form.elements[businesses[i]].checked) {
             var businessSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'business','" + businesses[i] + "')";
-            businessSQL += "<br>";
-            businessSQL += "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'not-if','" + businesses[i] + "')";
+            SQLDiv.innerHTML += businessSQL + "<br>";
+        }
+        if (form.elements[businesses[i] + '-not-if'].checked) {
+            var businessSQL = "INSERT INTO [homewizard_test2user].[Data_MTT_GS] ([mtt_id], [type], [gs_id]) values (" + dayOfYear + ",'not-if','" + businesses[i] + "')";
             SQLDiv.innerHTML += businessSQL + "<br>";
         }
     }
@@ -94,6 +106,7 @@ function clearFieldsB2C() {
     // Clear businesses
     for (var i = 0; i < businesses.length; i++) {
         form.elements[businesses[i]].checked = false;
+        form.elements[businesses[i] + '-not-if'].checked = false;
     }
 
     // Clear SQL Div
