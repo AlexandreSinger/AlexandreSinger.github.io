@@ -1,0 +1,162 @@
+<html>
+<head>
+    <title>EconFactorCalculator</title>
+</head>
+<body>
+    <h1>Econ Factor Calculator</h1>
+    <p>Supported calculations:
+        <ul>
+            <li>P|F</li>
+            <li>F|P</li>
+            <li>P|A (recall, valuation occurs one time period before first cash flow)</li>
+            <li>A|P</li>
+            <li>F|A (recall, valuation occurs just after last cash flow)</li>
+            <li>A|F</li>
+            <li>P|G (like annuity, valueation occurs one time period before first cash flow [first cash flow always 0]. Essentially 2 cash flows before)</li>
+            <li>G|P</li>
+        </ul>
+    Example format: (P|F 5%, 10) or (P|F 0.05, 10)
+    </p>
+    </br>
+    </br>
+    <span>(<input type="text" id="first" size="1" onkeydown="if(event.keyCode==13) submit();">|<input type="text" id="second" size="1" onkeydown="if(event.keyCode==13) submit();"> 
+        <input type="text" id="interest" size="4" onkeydown="if(event.keyCode==13) submit();">,
+        <input type="text" id="periods" size=4 onkeydown="if(event.keyCode==13) submit();">) = <div style="display: inline-block;" id="result"></div>
+    </span>
+    <br>
+    <br>
+    <p>growing annuity:
+        <ul>
+            <li>Like annuity, valuation occurs one time period before first cash flow</li>
+            <li>format: (P|A<sub>1</sub> i, g, n)</li>
+        </ul>
+    </p>
+    <span>(P|A<sub>1</sub> 
+        <input type="text" id="g_interest" size="4" onkeydown="if(event.keyCode==13) submit_growing();">,
+        <input type="text" id="g_growth" size="4" onkeydown="if(event.keyCode==13) submit_growing();">,
+        <input type="text" id="g_periods" size=4 onkeydown="if(event.keyCode==13) submit_growing();">) = <div style="display: inline-block;" id="g_result"></div>
+    </span>
+</body>
+
+<script type="text/javascript">
+    const resultDiv = document.getElementById("result");
+    const firstInput = document.getElementById("first");
+    const secondInput = document.getElementById("second");
+    const interestInput = document.getElementById("interest");
+    const periodsInput = document.getElementById("periods");
+
+    function futureValueFactor(i, n) {
+        return (1+i)**n;
+    }
+
+    function presentValueFactor(i, n) {
+        return 1/futureValueFactor(i, n);
+    }
+
+    function annuityPresentValueFactor(i, n) {
+        return (((1+i)**n)-1)/(i*((1+i)**n));
+    }
+
+    function presentValueAnnuityFactor(i, n) {
+        return 1/annuityPresentValueFactor(i, n);
+    }
+
+    function annuityFutureValueFactor(i, n) {
+        return (((1+i)**n)-1)/i;
+    }
+
+    function futureValueAnnuityFactor(i, n) {
+        return 1/annuityFutureValueFactor(i, n);
+    }
+
+    function gradientSeriesPresentValueFactor(i, n) {
+        return (1-((1+n*i)/((1+i)**(n))))/(i**2);
+    }
+
+    function presentValueGradientSeriesFactor(i, n) {
+        return 1/gradientSeriesPresentValueFactor(i, n);
+    }
+
+    var getFactor = {
+        "p": {
+            "f": presentValueFactor,
+            "a": annuityPresentValueFactor,
+            "g": gradientSeriesPresentValueFactor
+        },
+        "f": {
+            "p": futureValueFactor,
+            "a": annuityFutureValueFactor
+        },
+        "a": {
+            "f": futureValueAnnuityFactor,
+            "p": presentValueAnnuityFactor
+        },
+        "g": {
+            "p": presentValueGradientSeriesFactor
+        }
+    };
+
+    function submit() {
+        resultDiv.innerHTML = "";
+
+        var first = firstInput.value.toLowerCase().trim();
+        var second = secondInput.value.toLowerCase().trim();
+        var interest = interestInput.value.trim();
+        var periods = parseInt(periodsInput.value.trim());
+        
+        if (first == "" || second == "" || interest == "" || periods == NaN) {
+            resultDiv.innerHTML += "Invalid input.";
+            return;
+        }
+
+        if (interest.includes("%")) {
+            interest = parseFloat(interest.slice(0, -1)) / 100.0;
+        } else {
+            interest = parseFloat(interest);
+        }
+
+        var result = -1
+        try {
+            result = getFactor[first][second](interest, periods);
+        } catch (err) {
+            console.log(err);
+            console.log("Invalid input:", first, second)
+            resultDiv.innerHTML += "Invalid input.";
+            return;
+        }
+        resultDiv.innerHTML += result.toString();
+    }
+
+    // Growing annuity function
+    const g_resultDiv = document.getElementById("g_result");
+    const g_interestInput = document.getElementById("g_interest");
+    const g_growthInput = document.getElementById("g_growth");
+    const g_periodsInput = document.getElementById("g_periods");
+    function submit_growing() {
+        g_resultDiv.innerHTML = "";
+        var r = g_interestInput.value.trim();
+        var g = g_growthInput.value.trim();
+        var n = parseInt(g_periodsInput.value.trim());
+
+        if (r == "" || g == "" || n == NaN) {
+            g_resultDiv.innerHTML += "Invalid input.";
+            return;
+        }
+
+        if (r.includes("%")) {
+            r = parseFloat(r.slice(0, -1)) / 100.0;
+        } else {
+            r = parseFloat(r);
+        }
+
+        if (g.includes("%")) {
+            g = parseFloat(g.slice(0, -1)) / 100.0;
+        } else {
+            g = parseFloat(g);
+        }
+        var result = (1-((1+g)/(1+r))**n)/(r-g);
+        g_resultDiv.innerHTML += result.toString();
+    }
+</script>
+
+</html>
