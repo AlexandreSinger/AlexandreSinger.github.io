@@ -1,0 +1,87 @@
+<html>
+<head>
+    <title>Guess Who</title>
+    <style>
+        .title {
+            text-align: center;
+        }
+        .board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            width: 130px;
+            border-style: solid;
+            border-color: yellowgreen;
+        }
+        .image {
+            width: 130px;
+            height: 156px;
+            object-fit: cover;
+            object-position: center;
+        }
+        .name {
+            text-align: center;
+        }
+    </style>
+</head>
+<body onload="onLoad()">
+    <h1 class="title">Guess Who</h1>
+    <div class="board" id="board"><p>Loading baord...</p></div>
+</body>
+<script type="text/javascript">
+    const boardDiv = document.getElementById("board");
+    let People = [
+        ["Zuko", "https://upload.wikimedia.org/wikipedia/en/3/3e/Prince_Zuko.jpg"],
+        ["Katara", "https://i.pinimg.com/564x/4a/e9/b9/4ae9b96df3b7b721512ad89113b318fb.jpg"],
+        ["Toph", "https://i.ytimg.com/vi/9C4MmX1D4AY/maxresdefault.jpg"],
+        ["Suki", "https://static0.cbrimages.com/wordpress/wp-content/uploads/2020/08/suki-kyoshi-fire-header.jpg"],
+        ["Mai", "https://i.pinimg.com/originals/45/e4/91/45e49103fcaa27d05dcf77a0215583a2.jpg"],
+        ["June", "https://i.pinimg.com/originals/37/c4/c0/37c4c058342baae6a58bc1b902f44790.jpg"],
+        ["Aang", "https://miro.medium.com/max/1200/0*3xTjr7rYOjGYjKqi.jpg"],
+        ["Firelord Ozai", "https://64.media.tumblr.com/dd65b1bb12f64fd8b7090a3f4a61827b/tumblr_pq87d6QCcg1s8cma6_1280.jpg"],
+        ["Appa", "https://i.imgflip.com/2x0r29.png"],
+        ["Ty Lee", "https://www.looper.com/img/gallery/why-ty-lee-from-avatar-the-last-airbender-is-more-important-than-you-think/intro-1601996999.jpg"],
+        ["Joo Dee", "https://pbs.twimg.com/media/ECBQKHuXsAA8k4j.png"],
+        ["Admiral Zhao", "https://i.pinimg.com/originals/de/a9/71/dea971d7807d8ab3fddc1f86d6d592f0.png"],
+        ["King Bumi", "https://i.pinimg.com/originals/8f/88/b3/8f88b3566e903243476c55f8c4b9d3b1.jpg"],
+        ["Combustion Man", "https://i.ytimg.com/vi/TuMjYPU_kdw/maxresdefault.jpg"],
+        ["Cabbage Merchent", "https://www.looper.com/img/gallery/the-truth-about-avatar-the-last-airbenders-cabbage-merchant/intro-1591722918.jpg"],
+        ["Princess Azula", "https://i.redd.it/agt990qku3051.png"],
+        ["Princess Yue", "https://i.pinimg.com/originals/a0/56/1c/a0561c243a2996f31c3f008bd4b9f1a4.jpg"],
+        ["Jet", "https://m.media-amazon.com/images/M/MV5BMzQyZmFjMjctN2YyYS00N2ZhLWFlZDgtNmZhNGU1ZjhjNDg1XkEyXkFqcGdeQXVyMjgyOTI4Mg@@._V1_.jpg"],
+        ["Momo", "https://i.redd.it/oxh976hynng51.jpg"],
+        ["Sokka", "https://pm1.narvii.com/7669/2ee51e916b6eb84674449a79e554123031b0660er1-400-400v2_hq.jpg"],
+        ["Avatar Roku", "https://pbs.twimg.com/profile_images/843760301/Av_Roku_001_400x400.jpg"],
+        ["The Boulder", "https://img-lb.fireden.net/co/image/1579/30/1579307588326.png"],
+        ["Iroh", "https://lewtonbus.net/wp-content/uploads/2020/07/iroh.png"],
+        ["Bosco", "https://i.ytimg.com/vi/WOI7Kaao2pc/hqdefault.jpg"]
+    ];
+
+    let isFlipped = [];
+
+    function onLoad() {
+        boardDiv.innerHTML = "";
+        for (var i = 0; i < People.length; i++) {
+            boardDiv.innerHTML += "<div class=\"card\" id=\"" + People[i][0] + "\">"
+                               + "<img class=\"image\" id=\"" + i + "\" src=\"" + People[i][1] + "\">"
+                               + "<p class=\"name\">" + People[i][0] + "</p>"
+                               + "</div>";
+            isFlipped[i] = false;
+        }
+        boardDiv.addEventListener('click', event => {
+            if (event.target.tagName == "IMG") {
+                if (isFlipped[event.target.id]) {
+                    event.target.src = People[event.target.id][1];
+                    isFlipped[event.target.id] = false;
+                } else {
+                    event.target.src = "https://cdn.pixabay.com/photo/2019/03/03/20/23/flowers-4032775__340.png";
+                    isFlipped[event.target.id] = true;
+                }
+            }
+        });
+        console.log("The page has loaded.");
+    }
+</script>
+</html>
