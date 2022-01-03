@@ -70,8 +70,18 @@
       "Wood Fireplace"
     ];
 
+    // Empty array to store the IDs of found recalls. This is to check for duplicates.
+    var foundRecalls = [];
+
+    // When all ajax operations finish (in this case when all CPSC calls have been resolved), print the number found at the top of the displaydiv.
+    $(document).ajaxStop(function () {
+      $('#displayDiv').prepend("<p>Found " + foundRecalls.length + " recalls</p>");
+    });
+
     function submit() {
       $('#displayDiv').html("");
+      // Clear the found recalls
+      foundRecalls = [];
       for (var j = 0; j < applianceTypes.length; j++) {
         getCPSC(applianceTypes[j]);
       }
@@ -99,7 +109,14 @@
                 if (!recCollection[i]) {
                   noDataFound()
                 } else {
-                  printData(recCollection[i], restURL, applianceType, i);
+                  // If the RecallID of the recall has already been found do not print data
+                  if (foundRecalls.indexOf(recCollection[i].RecallID) == -1) {
+                    printData(recCollection[i], restURL, applianceType, i);
+                    // Add the recall ID of the data
+                    foundRecalls.push(recCollection[i].RecallID);
+                  } else {
+                    noDataFound()
+                  }
                 }
               }
             } else {
